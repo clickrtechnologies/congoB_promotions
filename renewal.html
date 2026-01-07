@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>concertpage</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.1/dist/css/bootstrap.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.slim.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.1/dist/js/bootstrap.bundle.min.js"></script>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+
+<body background="images/renew.jpg" style="background-repeat: no-repeat;">
+    <div class="align-items-center justify-content-center">
+        <!-- <div class="row"> -->
+
+        <div class="col-md-offset-2" style="margin-left: 200px;margin-top: -150px;">
+            <a href="#" onclick="confirmbtn(1)"><img src="images/renewal.png" class="karaokeimage"
+                    style="width: 70%;height: 80px;" /><br>
+                <a href="#" onclick="confirmbtn(2)"><img src="images/Buttons-03.png" class="karaokeimage"
+                        style="width: 70%;height: 80px;margin-top: 10px;" />
+        </div>
+        <!-- </div> -->
+    </div>
+    <script>
+        const params = new URLSearchParams(window.location.search);
+        function getBrowserDetails() {
+            const userAgent = navigator.userAgent;
+            let browserName, fullVersion, majorVersion;
+            let nameOffset, verOffset, ix;
+
+            // In Opera, the true version is after "Opera" or after "Version"
+            if ((verOffset = userAgent.indexOf("Opera")) !== -1) {
+                browserName = "Opera";
+                fullVersion = userAgent.substring(verOffset + 6);
+                if ((verOffset = userAgent.indexOf("Version")) !== -1)
+                    fullVersion = userAgent.substring(verOffset + 8);
+            }
+            // In MSIE, the true version is after "MSIE" in userAgent
+            else if ((verOffset = userAgent.indexOf("MSIE")) !== -1) {
+                browserName = "Microsoft Internet Explorer";
+                fullVersion = userAgent.substring(verOffset + 5);
+            }
+            // In Chrome, the true version is after "Chrome"
+            else if ((verOffset = userAgent.indexOf("Chrome")) !== -1) {
+                browserName = "Chrome";
+                fullVersion = userAgent.substring(verOffset + 7);
+            }
+            // In Safari, the true version is after "Safari" or after "Version"
+            else if ((verOffset = userAgent.indexOf("Safari")) !== -1) {
+                browserName = "Safari";
+                fullVersion = userAgent.substring(verOffset + 7);
+                if ((verOffset = userAgent.indexOf("Version")) !== -1)
+                    fullVersion = userAgent.substring(verOffset + 8);
+            }
+            // In Firefox, the true version is after "Firefox"
+            else if ((verOffset = userAgent.indexOf("Firefox")) !== -1) {
+                browserName = "Firefox";
+                fullVersion = userAgent.substring(verOffset + 8);
+            }
+            // In most other browsers, "name/version" is at the end of userAgent
+            else if ((nameOffset = userAgent.lastIndexOf(' ') + 1) <
+                (verOffset = userAgent.lastIndexOf('/'))) {
+                browserName = userAgent.substring(nameOffset, verOffset);
+                fullVersion = userAgent.substring(verOffset + 1);
+                if (browserName.toLowerCase() === browserName.toUpperCase()) {
+                    browserName = navigator.appName;
+                }
+            }
+
+            // Trimming the fullVersion string at the semicolon/space if present
+            if ((ix = fullVersion.indexOf(";")) !== -1)
+                fullVersion = fullVersion.substring(0, ix);
+            if ((ix = fullVersion.indexOf(" ")) !== -1)
+                fullVersion = fullVersion.substring(0, ix);
+
+            majorVersion = parseInt('' + fullVersion, 10);
+            if (isNaN(majorVersion)) {
+                fullVersion = '' + parseFloat(navigator.appVersion);
+                majorVersion = parseInt(navigator.appVersion, 10);
+            }
+
+            return {
+                browserName: browserName,
+                userAgent: navigator.userAgent,
+                platform: navigator.platform,
+                language: navigator.language,
+                pageName: 'renew',
+                msisdn: params.get('number')
+            };
+        }
+        window.onload = async function validateToken() {
+
+            // URL of the API endpoint
+            const validateTokenUrl = '/validate-token'; // Replace with your actual API URL
+
+            const token = localStorage.getItem('token')
+            // Data to send in the request body
+            const data = {
+                token: token
+            };
+
+            // Configuration for the fetch request
+            const requestOptions = {
+                method: 'POST', // HTTP method
+                headers: {
+                    'Content-Type': 'application/json' // Specify content type
+                },
+                body: JSON.stringify(data) // Convert data to JSON string
+            };
+
+            // Make the fetch request
+            fetch(validateTokenUrl, requestOptions)
+                .then(response => {
+                    if (!response.ok) {
+                        window.location.href = "/index"
+                    }
+                    return true; // Parse JSON response
+                })
+                .then(data => {
+                    console.log('Token validation response:', data);
+                    return true; // Parse JSON response
+                    // Handle success response here
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    window.location.href = "/index"
+                    // Handle error here
+                });
+                const details = getBrowserDetails();
+            // const detailsElement = JSON.stringify(details);
+
+            // Save analytics Data
+            fetch('/analytic', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': localStorage.getItem('token')
+                },
+                body: JSON.stringify(details)
+            })
+                .then(response => {
+                    if (response.ok) {
+                        console.log('Data saved successfully');
+                        // Optionally, perform any action on successful save
+                    } else {
+                        console.error('Failed to save data');
+                    }
+                })
+                .catch(error => {
+                    debugger;
+                    console.error('Error:', error);
+                });
+        }
+    
+        if (!params.has('number') || !params.has('pack') || !params.has('service') || !params.has('promoName')) {
+            window.location.href = "/index";
+        }
+        var service = params.get('service');
+        var pack = params.get('pack');
+        var promoName = params.get('promoName');
+
+        if (service == 'karaoke' && pack == 1 && promoName == 'kimia') {
+            document.getElementById("massage").innerHTML = "Abonnez-vous au plan quotidien @ 40XAF ";
+
+        } else if (service == 'karaoke' && pack == 2 && promoName == 'kimia') {
+            document.getElementById("massage").innerHTML = "Abonnez-vous au plan hebdomadaire @ 175XAF ";
+
+        }
+	function printLogs(msg) {
+            $.ajax({
+                url: "/log",
+                type: "POST",
+                dataType: "json",
+                contentType: "application/json; charset=utf-8",
+                data: JSON.stringify({
+                    msg: msg
+                }),
+                success: function (result) {
+                    console.log(result);
+                },
+                error: function (err) {
+                    console.log("error is", err);
+
+                }
+            });
+    }
+
+        function confirmbtn(renewal) {
+            // const params = new URLSearchParams(window.location.search);
+            $(".a_tag").addClass("disable-click");
+
+            var packName;
+            if (params.get('pack') == 1) {
+                packName = "daily";
+            } else {
+                packName = "weekly";
+            }
+
+	    let now = new Date(new Date());
+            const data = {
+                msisdn: params.get('number'),
+                packName: packName,
+                renewflag: renewal.toString(),
+                subunsubFlag: "S",
+                submode: "WAP",
+                promoName: params.get('promoName'),
+                promoId: params.get('clickId') ? params.get('clickId') : "637637678"
+            }
+            fetch('/saveData', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': localStorage.getItem('token')
+                },
+                body: JSON.stringify(data)
+            })
+                .then(response => {
+		    debugger;
+		    printLogs(now + ' Request for Sub : ' + JSON.stringify(data) + ' API Response : ' + JSON.stringify(response));
+                    if (response.ok) {
+                        console.log('Data saved successfully');
+                        window.location.href = "/Thankyou?clickId=" + params.get('clickId')+"&number="+params.get('number');
+                        // Optionally, perform any action on successful save
+                    } else {
+                        console.error('Failed to save data');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                });
+
+                
+
+        }
+        if (!params.has('number')) {
+            window.location.href = "/index";
+        }
+
+        // function kar(renewal) {
+        //     window.location.href = "/confirmpage?number=" + params.get('number') + "&service=karaoke&promoName=kimia&pack=" + params.get('packId') + "&clickId=" +params.get('clickId')+ "&renewal=" +renewal;
+        // }
+    </script>
+</body>
+
+</html>

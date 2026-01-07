@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Digital Promotion Mobile Karaoke</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <link href='http://fonts.googleapis.com/css?family=Oswald:400,300,700' rel='stylesheet' type='text/css'>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+
+<body id='body' background="images/mainpage.png" style="background-repeat: no-repeat;">
+    <div class="align-items-center justify-content-center">
+        <div>
+            <h1 style="color: red; text-align: justify; margin-top: -150px;">Welcome to MTN Mobile Karaoke</h1>
+            <div class="col-md-offset-2 inputicolumn">
+                <h1 style="color:rgb(173, 20, 20); text-align: left; margin-bottom: 20px; margin-top: 30px">Please enter your mobile number</h1>
+                <input type="text" size="50" id="phonenum" placeholder=" Entrez votre numéro de mobile ">
+            </div>
+
+            <div class="row">
+                <span id="massage" style="color: red;"></span>
+            </div>
+
+            <div class="col-md-offset-2 submitbtn">
+                <input type="button" name="submit" value="Soumettre" class="btn btn-primary btn-sm" onclick="return redirectPlan()">
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let token;
+        let mobileNumber = null;
+
+        function printLogs(msg) {
+            $.ajax({
+                url: "/log",
+                type: "POST",
+                dataType: "json",
+                contentType: "application/json; charset=utf-8",
+                data: JSON.stringify({ msg: msg }),
+                success: function (result) {
+                    console.log(result);
+                },
+                error: function (err) {
+                    console.log("error is", err);
+                }
+            });
+        }
+
+        function fetchToken() {
+            fetch('/generate-token')
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    if (data && data.token) {
+                        token = data.token;
+                        localStorage.setItem('token', token);
+                    //    printLogs("executing token API " + token);
+                    } else {
+                        printLogs('Token not generated');
+                    }
+                })
+                .catch(error => {
+                    printLogs('There was a problem with the fetch operation:', error);
+                });
+        }
+
+        function fetchMSISDN() {
+            fetch('http://mobbilewap.mtncongo.net:8080/congo/getmsisdn')
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    if (data && data.msisdn && data.msisdn.toUpperCase() !== 'NA') {
+                        mobileNumber = data.msisdn;
+                        printLogs("executing msisdn API not null " + mobileNumber);
+                        nextCode();
+                    } else {
+                     //   printLogs('MSISDN not available');
+                        nextCode();
+                    }
+                })
+                .catch(error => {
+                    printLogs('There was a problem with the fetch operation:', error);
+                    nextCode();
+                });
+        }
+
+        function getBrowserDetails() {
+            const userAgent = navigator.userAgent;
+            let browserName, fullVersion, majorVersion;
+            let nameOffset, verOffset, ix;
+
+            if ((verOffset = userAgent.indexOf("Opera")) !== -1) {
+                browserName = "Opera";
+                fullVersion = userAgent.substring(verOffset + 6);
+                if ((verOffset = userAgent.indexOf("Version")) !== -1) {
+                    fullVersion = userAgent.substring(verOffset + 8);
+                }
+            } else if ((verOffset = userAgent.indexOf("MSIE")) !== -1) {
+                browserName = "Microsoft Internet Explorer";
+                fullVersion = userAgent.substring(verOffset + 5);
+            } else if ((verOffset = userAgent.indexOf("Chrome")) !== -1) {
+                browserName = "Chrome";
+                fullVersion = userAgent.substring(verOffset + 7);
+            } else if ((verOffset = userAgent.indexOf("Safari")) !== -1) {
+                browserName = "Safari";
+                fullVersion = userAgent.substring(verOffset + 7);
+                if ((verOffset = userAgent.indexOf("Version")) !== -1) {
+                    fullVersion = userAgent.substring(verOffset + 8);
+                }
+            } else if ((verOffset = userAgent.indexOf("Firefox")) !== -1) {
+                browserName = "Firefox";
+                fullVersion = userAgent.substring(verOffset + 8);
+            } else if ((nameOffset = userAgent.lastIndexOf(' ') + 1) < (verOffset = userAgent.lastIndexOf('/'))) {
+                browserName = userAgent.substring(nameOffset, verOffset);
+                fullVersion = userAgent.substring(verOffset + 1);
+                if (browserName.toLowerCase() === browserName.toUpperCase()) {
+                    browserName = navigator.appName;
+                }
+            }
+
+            if ((ix = fullVersion.indexOf(";")) !== -1) {
+                fullVersion = fullVersion.substring(0, ix);
+            }
+            if ((ix = fullVersion.indexOf(" ")) !== -1) {
+                fullVersion = fullVersion.substring(0, ix);
+            }
+
+            majorVersion = parseInt('' + fullVersion, 10);
+            if (isNaN(majorVersion)) {
+                fullVersion = '' + parseFloat(navigator.appVersion);
+                majorVersion = parseInt(navigator.appVersion, 10);
+            }
+
+            const phonenumValue = document.getElementById("phonenum").value;
+
+            return {
+                browserName: browserName,
+                userAgent: navigator.userAgent,
+                platform: navigator.platform,
+                language: navigator.language,
+                pageName: 'index',
+                msisdn: mobileNumber ? mobileNumber : phonenumValue
+            };
+        }
+
+        function nextCode() {
+            const details = getBrowserDetails();
+
+            fetch('/analytic', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': localStorage.getItem('token')
+                },
+                body: JSON.stringify(details)
+            })
+                .then(response => {
+                    if (response.ok) {
+                        console.log('Data saved successfully');
+                    } else {
+                        console.error('Failed to save data');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                });
+
+            if (mobileNumber !== 'NA' && mobileNumber !== null) {
+                const params = new URLSearchParams(window.location.search);
+                if (params.has('service') && params.has('pack') && params.has('promoName')) {
+                    const service = params.get('service');
+                    const pack = params.get('pack');
+                    const promoName = params.get('promoName');
+                    printLogs("Service=" + service + " pack=" + pack + " promoName=" + promoName + " for msisdn=" + mobileNumber);
+
+                    if (service === 'karaoke' && pack == 1 && promoName === 'kimia') {
+                        window.location.href = "/confirmpage?number=" + mobileNumber + "&service=karaoke&pack=1&promoName=kimia&clickId=" + params.get('clickId');
+                    } else if (service === 'karaoke' && pack == 2 && promoName === 'kimia') {
+                        window.location.href = "/confirmpage?number=" + mobileNumber + "&service=karaoke&pack=2&promoName=kimia&clickId=" + params.get('clickId');
+                    } else {
+                        window.location.href = "/404";
+                    }
+                } else if (params.has('service') && !params.has('pack') && params.has('promoName')) {
+                    const service = params.get('service');
+                    const promoName = params.get('promoName');
+
+                    if (service === 'karaoke' && promoName === 'kimia') {
+                        window.location.href = "/karaokepage?number=" + mobileNumber + "&promoName=kimia&clickId=" + params.get('clickId');
+                    } else {
+                        window.location.href = "/404";
+                    }
+                } else {
+                    window.location.href = "/karaokepage?number=" + mobileNumber + "&clickId=" + params.get('clickId')+"&promoName="+params.get('promoName');
+                }
+            } else {
+                document.getElementById('body').style.display = 'block';
+            }
+        }
+
+        window.onload = function () {
+            document.getElementById('body').style.display = 'none';
+            fetchToken();
+            fetchMSISDN();
+        };
+
+        function redirectPlan() {
+            const mobileNo = document.getElementById("phonenum").value;
+            if (mobileNo === "") {
+                document.getElementById("massage").innerHTML = "**Veuillez renseigner le numéro de téléphone portable ";
+                return false;
+            } else if (isNaN(mobileNo)) {
+                document.getElementById("massage").innerHTML = "**Saisir uniquement des chiffres ";
+                return false;
+            } else if (mobileNo.length < 12 || mobileNo.length > 12) {
+                document.getElementById("massage").innerHTML = "**Le numéro de mobile doit être composé de 12 chiffres avec l'indicatif du pays ";
+                return false;
+            }
+
+            const details = getBrowserDetails();
+            fetch('/analytic', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': localStorage.getItem('token')
+                },
+                body: JSON.stringify(details)
+            })
+                .then(response => {
+                    if (response.ok) {
+                        console.log('Data saved successfully');
+                    } else {
+                        console.error('Failed to save data');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                });
+
+            const params = new URLSearchParams(window.location.search);
+            if (params.has('service') && params.has('pack')) {
+                const service = params.get('service');
+                const pack = params.get('pack');
+                const promoName = params.get('promoName');
+
+                if (service === 'karaoke' && pack == 1 && promoName === 'kimia') {
+                    window.location.href = "/confirmpage?number=" + mobileNo + "&service=karaoke&pack=1&promoName=kimia&clickId=" + params.get('clickId');
+                } else if (service === 'karaoke' && pack == 2 && promoName === 'kimia') {
+                    window.location.href = "/confirmpage?number=" + mobileNo + "&service=karaoke&pack=2&promoName=kimia&clickId=" + params.get('clickId');
+                } else {
+                    window.location.href = "/404";
+                }
+            } else if (params.has('service') && !params.has('pack') && params.has('promoName')) {
+                const service = params.get('service');
+                const promoName = params.get('promoName');
+
+                if (service === 'karaoke' && promoName === 'kimia') {
+                    window.location.href = "/karaokepage?number=" + mobileNo + "&promoName=kimia&clickId=" + params.get('clickId');
+                } else {
+                    window.location.href = "/404";
+                }
+            } else {
+                window.location.href = "/karaokepage?number=" + mobileNo + "&clickId=" + params.get('clickId')+"&promoName="+params.get('promoName');
+            }
+            return false;
+        }
+
+        function makeid() {
+            var result = '';
+            var characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+            var charactersLength = characters.length;
+            for (var i = 0; i < 16; i++) {
+                result += characters.charAt(Math.floor(Math.random() * charactersLength));
+            }
+            return result;
+        }
+    </script>
+</body>
+
+</html>
+
+

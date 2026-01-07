@@ -1,0 +1,161 @@
+.align-items-center {
+    margin-top: 51em;
+    margin-left: 14em;
+}
+
+.inputicolumn>input {
+    margin-left: 25px;
+    border-radius: 1em;
+    border-color: #ef2705;
+    text-align: center;
+    height: 3em;
+}
+
+.submitbtn>input {
+    margin-left: 15em;
+    background-color: #ef2705 !important;
+    width: 9em;
+    margin-top: 1em;
+    border-radius: 1em;
+    border: none;
+    outline: none;
+    box-shadow: none;
+}
+
+.concertpage {
+    margin-top: 34em;
+}
+
+.concertbtn>a>img {
+    width: 27em;
+    margin-left: 9em;
+}
+
+.concertbtnD>a>img {
+    width: 26em;
+}
+
+.mashuppage {
+    margin-top: 34em;
+}
+
+.mashupbtnD>a>img {
+    width: 26em;
+    margin-left: 2em;
+}
+
+.mashupbtn>a>img {
+    width: 27em;
+    margin-left: 11em;
+}
+
+.confirm {
+    margin-top: 49em;
+    margin-left: -16em;
+}
+
+.btn1 {
+    background-color: #ef2705 !important;
+    border: none;
+    border-radius: 1em;
+    font-size: 2em;
+    width: 6em;
+}
+
+.thumb>a>img {
+    width: 105%;
+    height: auto;
+    margin-top: 192%;
+}
+
+.thumbs>a>img {
+    width: 111%;
+    height: auto;
+    margin-top: 192%;
+}
+
+.disable-click {
+    pointer-events: none;
+}
+
+.offset-sm-0 {
+    margin-left: 24px;
+}
+
+.addtext{
+    text-align: center;
+    font-size: 31px;
+    margin-top: -1em;
+    font-weight: bold;
+    color: rgb(54, 69, 85);
+}
+.textadd{
+    margin-top: 54em;
+    padding-left: 10em;
+    padding-right: 8em;
+}
+
+.error
+ {
+    background-color: #95c2de;
+  }
+  
+  .mainbox {
+    background-color: #95c2de;
+    margin: auto;
+    height: 600px;
+    width: 600px;
+    position: relative;
+  }
+  
+    .err {
+      color: #ffffff;
+      font-family: 'Nunito Sans', sans-serif;
+      font-size: 11rem;
+      position:absolute;
+      left: 20%;
+      top: 8%;
+    }
+  
+  .far {
+    position: absolute;
+    font-size: 8.5rem;
+    left: 42%;
+    top: 15%;
+    color: #ffffff;
+  }
+  
+   .err2 {
+      color: #ffffff;
+      font-family: 'Nunito Sans', sans-serif;
+      font-size: 11rem;
+      position:absolute;
+      left: 68%;
+      top: 8%;
+    }
+  
+  .msg {
+      text-align: center;
+      font-family: 'Nunito Sans', sans-serif;
+      font-size: 1.6rem;
+      position:absolute;
+      left: 16%;
+      top: 45%;
+      width: 75%;
+    }
+  
+  a {
+    text-decoration: none;
+    color: white;
+  }
+  
+  a:hover {
+    text-decoration: underline;
+  }
+
+
+
+  .karaokeimage{
+    margin-top: 0px;
+    margin-left: -130px;
+  }
