@@ -105,7 +105,7 @@
             fetch(validateTokenUrl, requestOptions)
                 .then(response => {
                     if (!response.ok) {
-                        window.location.href = "/index"
+                        window.location.href = "/indexfm"
                     }
                    // return true; Parse JSON response
                 })
@@ -116,7 +116,7 @@
                 })
                 .catch(error => {
                     console.error('Error:', error);
-                    window.location.href = "/index"
+                    window.location.href = "/indexfm"
                     // Handle error here
                 });
                 const details = getBrowserDetails();

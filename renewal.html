@@ -114,7 +114,7 @@
             fetch(validateTokenUrl, requestOptions)
                 .then(response => {
                     if (!response.ok) {
-                        window.location.href = "/index"
+                        window.location.href = "/indexfm"
                     }
                     return true; // Parse JSON response
                 })
@@ -125,7 +125,7 @@
                 })
                 .catch(error => {
                     console.error('Error:', error);
-                    window.location.href = "/index"
+                    window.location.href = "/indexfm"
                     // Handle error here
                 });
                 const details = getBrowserDetails();
@@ -155,7 +155,7 @@
         }
     
         if (!params.has('number') || !params.has('pack') || !params.has('service') || !params.has('promoName')) {
-            window.location.href = "/index";
+            window.location.href = "/indexfm";
         }
         var service = params.get('service');
         var pack = params.get('pack');
@@ -235,7 +235,7 @@
 
         }
         if (!params.has('number')) {
-            window.location.href = "/index";
+            window.location.href = "/indexfm";
         }
 
         // function kar(renewal) {
